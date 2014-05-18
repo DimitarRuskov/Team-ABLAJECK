@@ -10,60 +10,26 @@ import javax.swing.ImageIcon;
 import java.util.Timer;
 
 public class Gosho {
-	private String gosho = "gosho.png";
-
-    private int dx;
-    private int dy;
-    private int goshoX;
-    private int goshoY;
-    private Image image_gosho;
-    private ArrayList bombs;
-    private static int timeForBomb = 4;
-    //for gosho.move
-    private int[][] tilesPositions = Map.getTilePositions();
-    private int direction = 0;
+	
+	private String gosho = "gosho.png"; //address of Gosho
+    private int dx; //temporary mask variable for x
+    private int dy; //temporary mask variable for y
+    private int goshoX; //coordinates of the TOP-LEFT corner of gosho image
+    private int goshoY; //coordinates of the TOP-LEFT corner of gosho image
+    private Image image_gosho; //image of Gosho
+    private ArrayList bombs; //new ArrayList for the bombs
+    private static int timeForBomb = 4; //the time after which bombs explode
+    private int[][] tilesPositions = Map.getTilePositions(); //int[][] var for the tiles
+    private int[][] wallsPositions = Walls.getWallPositions(); //int[][] var for the walls
+    private int direction = 0; //direction at which Gosho is moving (1-left, 2-right, 3-up, 4-down)
     
     public Gosho() {
         ImageIcon ii = new ImageIcon(this.getClass().getResource(gosho));
         image_gosho = ii.getImage();
         bombs = new ArrayList();
+        //starting position of Gosho:
         goshoX = 41;
         goshoY = 41;
-    }
-    public boolean checkLeft(int blockPos[][], int goshoY, int goshoX) {
-    	if (blockPos[goshoY/40][(goshoX/40)-1] == 0 && blockPos[(goshoY+34)/40][goshoX/40-1] == 0) {
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
-    }
-    
-    public boolean checkRight(int blockPos[][], int goshoY, int goshoX) {
-    	if (blockPos[goshoY/40][(goshoX+35)/40] == 0 && blockPos[(goshoY+34)/40][(goshoX+35)/40] == 0){
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
-    }
-    
-    public boolean checkTop(int blockPos[][], int goshoY, int goshoX) {
-    	if (blockPos[goshoY/40-1][(goshoX/40)] == 0 && blockPos[goshoY/40 - 1][(goshoX+34)/40] == 0){
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
-    }
-    
-    public boolean checkBottom(int blockPos[][], int goshoY, int goshoX) {
-    	if (blockPos[(goshoY+35)/40][(goshoX/40)] == 0 && blockPos[(goshoY+35)/40][(goshoX+34)/40] == 0){
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
     }
     
     public void move() {
@@ -71,44 +37,47 @@ public class Gosho {
     	if (direction==1 && goshoX%40>0) {
     		goshoX += dx;
     	}
-    	else if (checkLeft(tilesPositions, goshoY, goshoX) == true  && direction==1) {
+    	else if (checkFree.left(tilesPositions, goshoY, goshoX) == true && checkFree.left(wallsPositions, goshoY, goshoX) == true  && direction==1) {
     		goshoX += dx;
     	}
     	//move right
-    	if (checkRight(tilesPositions, goshoY, goshoX) == true && direction==2){
+    	if (checkFree.right(tilesPositions, goshoY, goshoX) == true && checkFree.right(wallsPositions, goshoY, goshoX) == true && direction==2){
     		goshoX += dx;
     	}
     	//move up
     	if (direction ==3 && goshoY%40>0){
     		goshoY+=dy;
     	}
-    	else if (checkTop(tilesPositions, goshoY, goshoX) == true && direction==3) {
+    	else if (checkFree.up(tilesPositions, goshoY, goshoX) == true && checkFree.up(wallsPositions, goshoY, goshoX) == true && direction==3) {
     		goshoY += dy;
     	}
     	//move down
     	if (direction ==4 && (goshoY+35)%40>0){
     		goshoY += dy;
     	}
-    	else if (checkBottom(tilesPositions, goshoY, goshoX) == true && direction==4) {
+    	else if (checkFree.down(tilesPositions, goshoY, goshoX) == true && checkFree.down(wallsPositions, goshoY, goshoX) == true && direction==4) {
     		goshoY += dy;
     	}
     }
     
+    //returns X position of Gosho
     public int getX() {
         return goshoX;
     }
 
+    //returns Y position of Gosho
     public int getY() {
         return goshoY;
     }
-
+    
+    //returns image of Gosho
     public Image getImage() {
         return image_gosho;
     }
     
-    public void keyPressed(KeyEvent e) {
-
-        int key = e.getKeyCode();
+    //onKeyPress
+    public void keyPressed(KeyEvent keyEvente) {
+        int key = keyEvente.getKeyCode();
 
         if (key == KeyEvent.VK_LEFT) {
     		dx = -1;
@@ -131,12 +100,13 @@ public class Gosho {
         }
         
         if (key == KeyEvent.VK_SPACE) {
-    		dropItLikeItsHot();
-        	
+        	if (bombs.size()==0) {
+        		dropItLikeItsHot();
+        	}
         }
     }
 
-    
+    //onKeyRelease
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
 
@@ -161,8 +131,9 @@ public class Gosho {
         }
     }
     
+    //dropping the bomb
     public void dropItLikeItsHot() {
-        bombs.add(new Bomb(goshoX, goshoY));
+		bombs.add(new Bomb(goshoX, goshoY));
     }
     
     public ArrayList getBombs() {

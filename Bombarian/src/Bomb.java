@@ -8,7 +8,7 @@ public class Bomb {
     
     public Bomb(int x, int y) {
 
-        ImageIcon ii = new ImageIcon(this.getClass().getResource("bomb.png"));
+        ImageIcon ii = new ImageIcon(this.getClass().getResource("bomb.gif"));
         image_bomb = ii.getImage();
         visible = true;
         this.x = x;
