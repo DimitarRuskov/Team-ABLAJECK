@@ -1,5 +1,5 @@
-
-public class checkFree {
+public class CheckFree {
+	
 	public static boolean left(int blockPos[][], int y, int x) {
     	if (blockPos[y/40][(x/40)-1] == 0 && blockPos[(y+34)/40][x/40-1] == 0) {
     		return true;

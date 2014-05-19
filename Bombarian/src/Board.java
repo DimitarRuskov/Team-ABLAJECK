@@ -10,7 +10,7 @@ public class Board extends JPanel implements ActionListener{
     private Gosho gosho; //the guy we move (Gosho)
     private Image tile; //image of UNBREAKABLE terrain (tiles)
     private Image wall; //image of BREAKABLE walls
-    private int goshoSPEED = 15; //the speed with which Gosho moves
+    private int goshoSPEED = 10; //the speed with which Gosho moves
     
     
     public Board() {
@@ -34,13 +34,10 @@ public class Board extends JPanel implements ActionListener{
     	
     }
     
-    //paint method: everything that happens on BOARD is painted by this method
+    //paint method: everything that happens on the BOARD is painted by this method
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2d = (Graphics2D)g;
-        
-        //draw Gosho
-    	g2d.drawImage(gosho.getImage(), gosho.getX(), gosho.getY(), this);
     	
     	//draw terrain
         String[] map = Map.insertMap();
@@ -70,16 +67,42 @@ public class Board extends JPanel implements ActionListener{
         for (int i = 0; i < bm.size(); i++ ) {
             Bomb m = (Bomb) bm.get(i);
             if (bm.size()==1) {
-            	g2d.drawImage(m.getImage(), m.getX()-m.getX()%40, m.getY()-m.getY()%40, this);
+            	if (m.getX()%40 < 20 && m.getY()%40 < 20) {
+            		g2d.drawImage(m.getImage(), m.getX()-m.getX()%40, m.getY()-m.getY()%40, this);
+            	}
+            	else if (m.getX()%40 > 20 && m.getY()%40 > 20) {
+            		g2d.drawImage(m.getImage(), m.getX()-m.getX()%40+40, m.getY()-m.getY()%40+40, this);
+            	}
+            	else if (m.getX()%40 < 20 && m.getY()%40 > 20) {
+            		g2d.drawImage(m.getImage(), m.getX()-m.getX()%40, m.getY()-m.getY()%40+40, this);
+            	}
+            	else if (m.getX()%40 > 20 && m.getY()%40 < 20) {
+            		g2d.drawImage(m.getImage(), m.getX()-m.getX()%40+40, m.getY()-m.getY()%40, this);
+            	}
             }
+        }
+        
+        //draw Gosho
+        if (gosho.getDirection() == 0) {
+        	g2d.drawImage(gosho.getImageSTATIC(), gosho.getX(), gosho.getY(), this);
+        }
+        else if (gosho.getDirection() == 1) {
+        	g2d.drawImage(gosho.getImageLEFT(), gosho.getX(), gosho.getY(), this);
+        }
+        else if (gosho.getDirection() == 2) {
+        	g2d.drawImage(gosho.getImageRIGHT(), gosho.getX(), gosho.getY(), this);
+        }
+        else if (gosho.getDirection() == 3) {
+        	g2d.drawImage(gosho.getImageUP(), gosho.getX(), gosho.getY(), this);
+        }
+        else if (gosho.getDirection() == 4) {
+        	g2d.drawImage(gosho.getImageDOWN(), gosho.getX(), gosho.getY(), this);
         }
         
         //something that is needed for us to sync everything
         Toolkit.getDefaultToolkit().sync();
         g.dispose();
     }
-    
-    
     
     //moving Gosho
     public void actionPerformed(ActionEvent e) {
